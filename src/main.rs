@@ -109,4 +109,41 @@ mod tests {
             vec![0, 3, 4, 0, 0, 0, 0, 0, 9, 0]
         );
     }
+    #[test]
+    fn self_loop() {
+        let g = EdgeList {
+            tail: vec![0, 2],
+            head: vec![0, 2],
+        };
+        let dg = dicomp_incidence_list_construct(&g, 3, 1);
+        assert_eq!(dg.edge_first, vec![0, 0, 1, 0]);
+        assert_eq!(dg.edge_next, vec![0, 0]);
+        assert_eq!(dg.rev_edge_first, vec![0, 0, 1, 0]);
+        assert_eq!(dg.rev_edge_next, vec![0, 0]);
+    }
+
+    #[test]
+    fn multi_edges_same_pair() {
+        let g = EdgeList {
+            tail: vec![0, 1, 1],
+            head: vec![0, 2, 2],
+        };
+        let dg = dicomp_incidence_list_construct(&g, 2, 2);
+        assert_eq!(dg.edge_first, vec![0, 1, 0]);
+        assert_eq!(dg.edge_next, vec![0, 2, 0]);
+        assert_eq!(dg.rev_edge_first, vec![0, 0, 1]);
+        assert_eq!(dg.rev_edge_next, vec![0, 2, 0]);
+    }
+
+    #[test]
+    fn preserves_input_order_per_tail() {
+        // a=1..4 を (1→4),(1→3),(1→2),(1→5) とする
+        let g = EdgeList {
+            tail: vec![0, 1, 1, 1, 1],
+            head: vec![0, 4, 3, 2, 5],
+        };
+        let dg = dicomp_incidence_list_construct(&g, 5, 4);
+        assert_eq!(dg.edge_first[1], 1);
+        assert_eq!(dg.edge_next, vec![0, 2, 3, 4, 0]); // 1→2→3→4
+    }
 }
